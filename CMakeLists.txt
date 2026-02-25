@@ -8,15 +8,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 按平台设置输出目录
 if (WIN32)
-    # Windows: DLL EXE 导入库 放 bin_win
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_win)  # .exe, .dll
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_win)  # .dll
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_win)  # .lib
+    # Windows: DLL EXE 导入库
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_win64)  # .exe, .dll
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_win64)  # .dll
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_win64)  # .lib
+    message(STATUS "Platform: Windows 64")
 else()
-    # Linux/macOS: 可执行文件 库文件 放 bin_linux
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_linux)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_linux)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_linux)
+    # Linux: 可执行文件 库文件
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_arm64)
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_arm64)
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_arm64)
+        message(STATUS "Platform: Linux ARM64")
+    else()
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_x64)
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_x64)
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin_x64)
+        message(STATUS "Platform: Linux x64")
+    endif()
+
 endif()
 
 # 查找 OpenMP
@@ -37,7 +47,7 @@ target_include_directories(${PROJECT_NAME}_test PRIVATE
 # 添加编译选项
 target_compile_options(${PROJECT_NAME}_test PRIVATE -O3)
 
-# 链接动态库库和 OpenMP 库
+# 链接动态库 和 OpenMP 库
 target_link_libraries(${PROJECT_NAME}_test PRIVATE
         summertts # 链接到动态库
 )
