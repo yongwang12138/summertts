@@ -45,7 +45,19 @@ target_include_directories(${PROJECT_NAME}_test PRIVATE
 )
 
 # 添加编译选项
-target_compile_options(${PROJECT_NAME}_test PRIVATE -O3)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64|arm64")
+    target_compile_options(${PROJECT_NAME}_test PRIVATE 
+        -O3 
+        -march=armv8.2-a+fp16+rcpc+dotprod
+        -mtune=generic-armv8-a # 通用 ARMv8 优化
+        -ftree-vectorize
+        -funroll-loops # 循环展开
+    )
+    message(STATUS "启用RK3588 ARM 编译优化")
+else()
+    target_compile_options(${PROJECT_NAME}_test PRIVATE -O3)
+    message(STATUS "使用默认编译优化")
+endif()
 
 # 链接动态库 和 OpenMP 库
 target_link_libraries(${PROJECT_NAME}_test PRIVATE
